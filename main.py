@@ -1,4 +1,4 @@
-
+from expense_manager import add_expense, calculate_total
 
 def main():
     print("Expense Tracker")
@@ -8,6 +8,8 @@ def main():
 
     add_expense(amount, category, description)
     print("Expense added successfully")
+
+    print("Total spent:", calculate_total())
 
 if __name__ == "__main__":
     main()
