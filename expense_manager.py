@@ -22,3 +22,18 @@ def calculate_total():
         total += expense["amount"]
 
     return total
+
+
+def list_expenses():
+    expenses = load_expenses()
+
+    if not expenses:
+        print("No expenses found.")
+        return
+
+    for expense in expenses:
+        print(
+            f"Amount: {expense['amount']} | "
+            f"Category: {expense['category']} | "
+            f"Description: {expense['description']}"
+        )
