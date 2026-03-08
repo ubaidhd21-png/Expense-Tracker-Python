@@ -37,3 +37,20 @@ def list_expenses():
             f"Category: {expense['category']} | "
             f"Description: {expense['description']}"
         )
+
+
+def filter_by_category(category):
+    expenses = load_expenses()
+    found = False
+
+    for expense in expenses:
+        if expense["category"].lower() == category.lower():
+            print(
+                f"Amount: {expense['amount']} | "
+                f"Category: {expense['category']} | "
+                f"Description: {expense['description']}"
+            )
+            found = True
+
+    if not found:
+        print("No expenses found for this category.")
