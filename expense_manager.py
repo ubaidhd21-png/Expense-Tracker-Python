@@ -1,56 +1,63 @@
-from file_handler import load_expenses, save_expenses
+
+from db import connect
 
 
-def add_expense(amount, category, description):
-    expenses = load_expenses()
+def add_expense(user_id, amount, category, description):
+    conn = connect()
+    cursor = conn.cursor()
 
-    expense = {
-        "amount": amount,
-        "category": category,
-        "description": description
-    }
+    cursor.execute(
+        "INSERT INTO expenses (user_id, amount, category, description) VALUES (?, ?, ?, ?)",
+        (user_id, amount, category, description)
+    )
 
-    expenses.append(expense)
-    save_expenses(expenses)
-
-
-def calculate_total():
-    expenses = load_expenses()
-    total = 0
-
-    for expense in expenses:
-        total += expense["amount"]
-
-    return total
+    conn.commit()
+    conn.close()
 
 
-def list_expenses():
-    expenses = load_expenses()
+def calculate_total(user_id):
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT SUM(amount) FROM expenses WHERE user_id=?", (user_id,))
+    result = cursor.fetchone()[0]
+
+    conn.close()
+    return result if result else 0
+
+
+def list_expenses(user_id):
+    conn = connect()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT amount, category, description FROM expenses WHERE user_id=?", (user_id,))
+    expenses = cursor.fetchall()
+
+    conn.close()
 
     if not expenses:
         print("No expenses found.")
         return
 
-    for expense in expenses:
-        print(
-            f"Amount: {expense['amount']} | "
-            f"Category: {expense['category']} | "
-            f"Description: {expense['description']}"
-        )
+    for exp in expenses:
+        print(f"Amount: {exp[0]} | Category: {exp[1]} | Description: {exp[2]}")
 
 
-def filter_by_category(category):
-    expenses = load_expenses()
-    found = False
+def filter_by_category(user_id, category):
+    conn = connect()
+    cursor = conn.cursor()
 
-    for expense in expenses:
-        if expense["category"].lower() == category.lower():
-            print(
-                f"Amount: {expense['amount']} | "
-                f"Category: {expense['category']} | "
-                f"Description: {expense['description']}"
-            )
-            found = True
+    cursor.execute(
+        "SELECT amount, category, description FROM expenses WHERE user_id=? AND category=?",
+        (user_id, category)
+    )
 
-    if not found:
-        print("No expenses found for this category.")
+    expenses = cursor.fetchall()
+    conn.close()
+
+    if not expenses:
+        print("No expenses found.")
+        return
+
+    for exp in expenses:
+        print(f"Amount: {exp[0]} | Category: {exp[1]} | Description: {exp[2]}")
